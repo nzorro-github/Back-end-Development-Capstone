@@ -9,18 +9,18 @@ RUN apt-get update \
 ENV APP=/app
 
 # 2. insert code to change the working directory to $APP
-
+WORKDIR $APP
 # 3. insert code to copy the requirements.txt file to $APP
-
+COPY requirements.txt ./
 # 4. insert code to install requirements from requirements.txt
-
+pip install -r requirements.txt
 # 5. insert code to copy the rest of the files into $APP
-
+COPY . ./
 # 6. insert code to expose the port here 
-
+EXPOSE 8000
 RUN chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/bin/bash","/app/entrypoint.sh"]
 
 # 7. insert code to set the run command to "python manage.py runserver 0.0.0.0:8000"
-
+CMD = ["python3", "manage.py", "0.0.0.0:8000"]
