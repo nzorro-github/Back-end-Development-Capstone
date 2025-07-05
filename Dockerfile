@@ -23,4 +23,4 @@ RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/bin/bash","/app/entrypoint.sh"]
 
 # 7. insert code to set the run command to "python manage.py runserver 0.0.0.0:8000"
-CMD = ["python3", "manage.py","runserver", "0.0.0.0:8000"]
+CMD ["python3", "manage.py","runserver", "0.0.0.0:8000"]
