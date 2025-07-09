@@ -1,7 +1,7 @@
 locals {
-  postgres_svc = "${var.project}-postgres-svc"
+  postgres_svc        = "${var.project}-postgres-svc"
   picture_service_url = "http://${var.project}-picture-svc:${var.picture_service_port}"
-  song_service_url = "http://${var.project}-song-svc:${var.song_service_port}"
+  song_service_url    = "http://${var.project}-song-svc:${var.song_service_port}"
 }
 
 resource "kubernetes_service_account" "sa" {
@@ -22,11 +22,11 @@ resource "kubernetes_secret_v1" "secret" {
     namespace = var.environment
   }
   data = {
-    POSTGRES_HOST      = local.postgres_svc
-    POSTGRES_PASSWORD  = base64encode(var.POSTGRES_PASSWORD)
-    SUPERUSER_PASSWORD = var.POSTGRES_PASSWORD
+    POSTGRES_HOST       = local.postgres_svc
+    POSTGRES_PASSWORD   = base64encode(var.POSTGRES_PASSWORD)
+    SUPERUSER_PASSWORD  = var.POSTGRES_PASSWORD
     PICTURE_SERVICE_URL = local.picture_service_url
-    SONG_SERVICE_URL = local.song_service_url
+    SONG_SERVICE_URL    = local.song_service_url
   }
 }
 
