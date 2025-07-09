@@ -75,30 +75,23 @@ WSGI_APPLICATION = "django_concert.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': f'{os.environ.get("POSTGRES_PASSWORD")}',
+        'HOST': f'{os.environ.get("POSTGRES_HOST")}',
+        'PORT': '5432',
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'DB_NAME',
-#         'USER': 'DB_USER',
-#         'PASSWORD': 'DB_PASSWORD',
-#         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
-#         'PORT': '3306',
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
+VALIDATOR = 'django.contrib.auth.password_validation.MinimumLengthValidator'
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': f'{VALIDATOR}',
         'OPTIONS': {
             'min_length': 3,
         }
@@ -121,7 +114,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-# STATIC_URL = 'static/'
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
