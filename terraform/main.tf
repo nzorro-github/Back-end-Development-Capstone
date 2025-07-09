@@ -20,8 +20,9 @@ resource "kubernetes_secret_v1" "secret" {
     namespace = var.environment
   }
   data = {
-    POSTGRES_HOST     = local.postgres_svc
-    POSTGRES_PASSWORD = base64encode(var.POSTGRES_PASSWORD)
+    POSTGRES_HOST      = local.postgres_svc
+    POSTGRES_PASSWORD  = base64encode(var.POSTGRES_PASSWORD)
+    SUPERUSER_PASSWORD = base64encode(var.POSTGRES_PASSWORD)
   }
 }
 
@@ -103,7 +104,7 @@ resource "kubernetes_service_v1" "postgres_svc" {
   }
 }
 ###############################################
-# DJANGO CONCERT DEPLOYMENT
+# DJANGO CONCERT APP K8S DEPLOYMENT
 ################################################
 resource "kubernetes_deployment_v1" "django" {
   metadata {
@@ -164,7 +165,7 @@ resource "kubernetes_deployment_v1" "django" {
 }
 
 ###############################################
-# DJANGO CONCERT K8S SERVICE
+# DJANGO CONCERT APP K8S SERVICE
 ################################################
 resource "kubernetes_service_v1" "django_svc" {
   metadata {
