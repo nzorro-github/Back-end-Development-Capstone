@@ -1,3 +1,7 @@
+locals {
+  postgres_svc = "${var.project}-postgres-svc"
+}
+
 resource "kubernetes_service_account" "sa" {
   metadata {
     name      = "${var.project}-service-account"
@@ -16,6 +20,7 @@ resource "kubernetes_secret_v1" "secret" {
     namespace = var.environment
   }
   data = {
+    POSTGRES_HOST     = local.postgres_svc
     POSTGRES_PASSWORD = base64encode(var.POSTGRES_PASSWORD)
   }
 }
@@ -75,7 +80,31 @@ resource "kubernetes_deployment_v1" "postgres" {
     }
   }
 }
+###############################################
+# PostgreSQL K8S SERVICE
+################################################
+resource "kubernetes_service_v1" "postgres_svc" {
+  metadata {
+    name      = local.postgres_svc
+    namespace = var.environment
+  }
 
+  spec {
+    selector = {
+      app = kubernetes_deployment_v1.postgres.spec[0].template[0].metadata[0].labels.app
+      env = kubernetes_deployment_v1.postgres.spec[0].template[0].metadata[0].labels.env
+    }
+    type = "ClusterIP"
+    port {
+      target_port = 5432
+      port        = 5432
+      protocol    = "TCP"
+    }
+  }
+}
+###############################################
+# DJANGO CONCERT DEPLOYMENT
+################################################
 resource "kubernetes_deployment_v1" "django" {
   metadata {
     name      = "${var.project}-webapp"
@@ -112,6 +141,12 @@ resource "kubernetes_deployment_v1" "django" {
           image = var.image
           name  = "${var.project}-ctr"
 
+          env_from {
+            secret_ref {
+              name = kubernetes_secret_v1.secret.metadata[0].name
+            }
+          }
+
           resources {
             limits = {
               cpu    = "1.0"
@@ -124,6 +159,30 @@ resource "kubernetes_deployment_v1" "django" {
           }
         }
       }
+    }
+  }
+}
+
+###############################################
+# DJANGO CONCERT K8S SERVICE
+################################################
+resource "kubernetes_service_v1" "django_svc" {
+  metadata {
+    name      = "${var.project}-svc"
+    namespace = var.environment
+  }
+
+  spec {
+    selector = {
+      app = kubernetes_deployment_v1.django.spec[0].template[0].metadata[0].labels.app
+      env = kubernetes_deployment_v1.django.spec[0].template[0].metadata[0].labels.env
+
+    }
+    type = "ClusterIP"
+    port {
+      target_port = 8000
+      port        = 8000
+      protocol    = "TCP"
     }
   }
 }
